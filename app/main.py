@@ -65,12 +65,21 @@ def startup():
         db.close()
 
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
+FRONTEND_URL = os.getenv("FRONTEND_URL")
+
+ALLOWED_ORIGINS = [
+    origin
+    for origin in [
+        FRONTEND_URL,
         "http://localhost:5173",
         "http://127.0.0.1:5173",
-    ],
+    ]
+    if origin
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
