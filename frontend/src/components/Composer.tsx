@@ -1,49 +1,31 @@
-import { useEffect, useRef } from 'react'
-import type { KeyboardEvent } from 'react'
 import { ArrowUp } from 'lucide-react'
+import { useState } from 'react'
 
 interface ComposerProps {
+  disabled: boolean
   onSend: (message: string) => void
-  disabled?: boolean
-  hasConversation: boolean
 }
 
 function Composer({
+  disabled,
   onSend,
-  disabled = false,
 }: ComposerProps) {
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
-
-  useEffect(() => {
-    const textarea = textareaRef.current
-    if (!textarea) return
-
-    textarea.style.height = 'auto'
-    textarea.style.height = `${Math.min(textarea.scrollHeight, 180)}px`
-  }, [])
-
-  function resizeTextarea() {
-    const textarea = textareaRef.current
-    if (!textarea) return
-
-    textarea.style.height = 'auto'
-    textarea.style.height = `${Math.min(textarea.scrollHeight, 180)}px`
-  }
+  const [message, setMessage] = useState('')
 
   function submit() {
-    const value = textareaRef.current?.value.trim() ?? ''
+    const trimmed = message.trim()
 
-    if (!value || disabled) return
-
-    onSend(value)
-
-    if (textareaRef.current) {
-      textareaRef.current.value = ''
-      textareaRef.current.style.height = 'auto'
+    if (!trimmed || disabled) {
+      return
     }
+
+    onSend(trimmed)
+    setMessage('')
   }
 
-  function handleKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
+  function handleKeyDown(
+    event: React.KeyboardEvent<HTMLTextAreaElement>,
+  ) {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault()
       submit()
@@ -51,48 +33,34 @@ function Composer({
   }
 
   return (
-    <div className="mx-auto w-full max-w-3xl px-4 pb-4 sm:px-6 sm:pb-6">
-      <div
-        className={[
-          'rounded-2xl border bg-zinc-900/80 shadow-2xl shadow-black/10 backdrop-blur-xl transition',
-          disabled
-            ? 'border-zinc-800 opacity-70'
-            : 'border-zinc-800 focus-within:border-zinc-700',
-        ].join(' ')}
-      >
-        <div className="flex items-end gap-2 p-2.5">
-          <textarea
-            ref={textareaRef}
-            rows={1}
-            disabled={disabled}
-            onKeyDown={handleKeyDown}
-            onInput={resizeTextarea}
-            placeholder="Message Orbit..."
-            
-            className="max-h-[180px] min-h-[42px] flex-1 resize-none bg-transparent px-2.5 py-2.5 text-[15px] leading-6 text-zinc-100 outline-none placeholder:text-zinc-600 disabled:cursor-not-allowed"
-          />
+    <div className="shrink-0 border-t border-zinc-800 bg-[#0b0b0b] px-3 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:px-4 sm:py-4">
+      <div className="mx-auto flex w-full max-w-3xl items-end gap-2 rounded-2xl border border-zinc-800 bg-[#111111] p-2 shadow-2xl">
+        <textarea
+          value={message}
+          onChange={(event) =>
+            setMessage(event.target.value)
+          }
+          onKeyDown={handleKeyDown}
+          disabled={disabled}
+          rows={1}
+          placeholder="Message your assistant..."
+          className="max-h-48 min-h-11 min-w-0 flex-1 resize-none bg-transparent px-3 py-2.5 text-sm text-white outline-none placeholder:text-zinc-600"
+        />
 
-          <button
-            type="button"
-            onClick={submit}
-            disabled={disabled}
-            className="mb-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white text-black transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:bg-zinc-800 disabled:text-zinc-600"
-            aria-label="Send message"
-          >
-            <ArrowUp size={17} strokeWidth={2.5} />
-          </button>
-        </div>
-
-        <div className="flex items-center justify-between px-4 pb-2.5">
-          <span className="text-[10px] text-zinc-700">
-            Enter to send · Shift + Enter for newline
-          </span>
-
-          <span className="text-[10px] text-zinc-700">
-            AI assistant
-          </span>
-        </div>
+        <button
+          type="button"
+          onClick={submit}
+          disabled={disabled || !message.trim()}
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-black transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-30"
+          aria-label="Send message"
+        >
+          <ArrowUp size={18} />
+        </button>
       </div>
+
+      <p className="mt-2 hidden text-center text-[11px] text-zinc-700 sm:block">
+        Enter to send · Shift + Enter for a new line
+      </p>
     </div>
   )
 }

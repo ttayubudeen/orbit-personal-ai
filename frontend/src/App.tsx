@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import AuthScreen from './components/AuthScreen'
 import ChatArea from './components/ChatArea'
 import Sidebar from './components/Sidebar'
+import AdminUsage from './components/AdminUsage'
 import {
   createConversation,
   getConversations,
@@ -17,6 +18,8 @@ import type {
 
 function App() {
   const [user, setUser] = useState<User | null>(null)
+  const [adminUsageOpen, setAdminUsageOpen] =
+    useState(false)
   const [conversations, setConversations] = useState<
     Conversation[]
   >([])
@@ -172,8 +175,19 @@ function App() {
     )
   }
 
+  if (adminUsageOpen) {
+    return (
+      <div className="flex h-[100dvh] overflow-hidden bg-[#0b0b0b] text-white">
+        <AdminUsage
+          onBack={() => setAdminUsageOpen(false)}
+        />
+      </div>
+    )
+  }
+
+
   return (
-    <div className="flex h-screen overflow-hidden bg-[#0b0b0b] text-white">
+    <div className="flex h-[100dvh] overflow-hidden bg-[#0b0b0b] text-white">
       <Sidebar
         user={user}
         conversations={conversations}
@@ -185,14 +199,14 @@ function App() {
         onNewChat={handleNewChat}
         onSelectConversation={handleSelectConversation}
         onLogout={handleLogout}
+        isAdmin={user.is_admin}
+        onOpenUsage={() => setAdminUsageOpen(true)}
       />
 
       <ChatArea
         messages={messages}
         loading={loading}
         sending={sending}
-        disabled={sending}
-        hasConversation={Boolean(activeConversationId)}
         onSend={handleSend}
         onOpenSidebar={() => setMobileSidebarOpen(true)}
       />

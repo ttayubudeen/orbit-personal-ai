@@ -1,5 +1,6 @@
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ?? 'http://127.0.0.1:8000'
+  import.meta.env.VITE_API_BASE_URL ??
+  'http://127.0.0.1:8000'
 
 async function request<T>(
   endpoint: string,
@@ -41,6 +42,7 @@ export interface User {
   name: string
   email: string
   is_active: boolean
+  is_admin: boolean
   created_at: string
 }
 
@@ -133,4 +135,43 @@ export async function sendMessage(
       message,
     }),
   })
+}
+
+
+export interface UsageSummary {
+  ai_requests: number
+  input_tokens: number
+  output_tokens: number
+  total_tokens: number
+  users: number
+}
+
+export interface UsageByModel {
+  provider: string
+  model: string
+  requests: number
+  input_tokens: number
+  output_tokens: number
+  total_tokens: number
+}
+
+export interface UsageByUser {
+  user_id: string
+  name: string
+  email: string
+  requests: number
+  input_tokens: number
+  output_tokens: number
+  total_tokens: number
+}
+
+export interface AdminUsage {
+  period: string
+  summary: UsageSummary
+  by_model: UsageByModel[]
+  by_user: UsageByUser[]
+}
+
+export async function getAdminUsage() {
+  return request<AdminUsage>('/admin/usage')
 }

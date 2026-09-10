@@ -1,4 +1,5 @@
 import {
+  BarChart3,
   LogOut,
   MessageSquare,
   Plus,
@@ -17,6 +18,8 @@ interface SidebarProps {
   onNewChat: () => void
   onSelectConversation: (id: string) => void
   onLogout: () => void
+  isAdmin: boolean
+  onOpenUsage: () => void
 }
 
 function Sidebar({
@@ -28,6 +31,8 @@ function Sidebar({
   onNewChat,
   onSelectConversation,
   onLogout,
+  isAdmin,
+  onOpenUsage,
 }: SidebarProps) {
   const initials = user.name
     .split(' ')
@@ -140,6 +145,21 @@ function Sidebar({
         </div>
 
         <div className="border-t border-zinc-800/70 p-3">
+            {isAdmin && (
+              <div className="border-t border-zinc-800/70 px-3 py-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    onOpenUsage()
+                    onMobileClose()
+                  }}
+                  className="flex h-10 w-full items-center gap-2.5 rounded-xl border border-zinc-800 bg-zinc-900/50 px-3 text-sm font-medium text-zinc-400 transition hover:border-zinc-700 hover:bg-zinc-800 hover:text-zinc-100"
+                >
+                  <BarChart3 size={16} />
+                  Usage
+                </button>
+              </div>
+            )}
           <div className="mb-3 rounded-xl border border-zinc-800 bg-zinc-950/60 px-4 py-3">
             <div className="flex items-center justify-between">
               <span className="text-[10px] uppercase tracking-[0.22em] text-zinc-600">

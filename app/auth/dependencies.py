@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.auth.security import decode_access_token
+import os
 
 
 security = HTTPBearer()
@@ -54,4 +55,13 @@ def get_current_user(
             detail="User account is inactive.",
         )
 
-    return dict(user._mapping)
+    user = dict(user._mapping)
+
+    admin_user_id = os.getenv("ADMIN_USER_ID")
+
+    user["is_admin"] = bool(
+        admin_user_id
+        and str(user["id"]) == str(admin_user_id)
+    )
+
+    return user
