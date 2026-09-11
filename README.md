@@ -1,10 +1,58 @@
-# ORBIT — Personal AI Assistant
+<div align="center">
+
+# 🛰️ ORBIT — Personal AI Assistant
+
+**A full-stack personal AI assistant combining conversational AI with persistent personal data — memory, tasks, meetings, and conversations, all behind a secure, application-controlled tool layer.**
+
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-orbit--frontend-4f46e5?style=for-the-badge)](https://orbit-frontend-l5sq.onrender.com/)
+[![GitHub Repo](https://img.shields.io/badge/GitHub-orbit--personal--ai-181717?style=for-the-badge&logo=github)](https://github.com/ttayubudeen/orbit-personal-ai)
+
+![Python](https://img.shields.io/badge/Python-3.12+-3776AB?style=flat-square&logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white)
+![React](https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white)
+
+</div>
+
+---
+
+## 📌 Overview
 
 ORBIT is a full-stack personal AI assistant built to combine conversational AI with persistent personal data.
 
 It provides a ChatGPT-style conversational interface while allowing the assistant to work with user-specific conversations, memories, tasks, and meetings through an application-controlled tool system.
 
 The project is built with **FastAPI, PostgreSQL, React, TypeScript, and multiple AI providers**, with automatic provider fallback for improved reliability.
+
+> 🔗 **Live app:** [orbit-frontend-l5sq.onrender.com](https://orbit-frontend-l5sq.onrender.com/)
+> 🔗 **Source:** [github.com/ttayubudeen/orbit-personal-ai](https://github.com/ttayubudeen/orbit-personal-ai)
+
+<!--
+📸 Add a screenshot or short GIF of the chat interface here, e.g.:
+![ORBIT chat interface](docs/screenshot-chat.png)
+-->
+
+---
+
+## 📖 Table of Contents
+
+- [Features](#-features)
+- [Architecture](#️-architecture)
+- [AI Provider System](#-ai-provider-system)
+- [Tech Stack](#️-tech-stack)
+- [Project Structure](#-project-structure)
+- [Getting Started](#-getting-started)
+- [Database](#️-database)
+- [Security](#-security)
+- [Usage Tracking](#-usage-tracking)
+- [Deployment](#️-deployment)
+- [Local Verification](#-local-verification)
+- [V1 Scope](#️-v1-scope)
+- [Future Improvements](#-future-improvements)
+- [Author](#-author)
+- [License](#-license)
 
 ---
 
@@ -190,34 +238,13 @@ This allows the assistant to continue operating even when an individual AI provi
 
 ## 🛠️ Tech Stack
 
-**Frontend**
-- React
-- TypeScript
-- Vite
-- Tailwind CSS
-- Lucide React
-
-**Backend**
-- Python
-- FastAPI
-- SQLAlchemy
-- Pydantic
-- JWT
-- pwdlib
-- Argon2
-
-**Database**
-- PostgreSQL
-
-**AI Providers**
-- Google Gemini
-- Groq
-- OpenAI
-
-**Deployment**
-- Render
-- Render PostgreSQL
-- Docker
+| Layer | Technologies |
+|---|---|
+| **Frontend** | React, TypeScript, Vite, Tailwind CSS, Lucide React |
+| **Backend** | Python, FastAPI, SQLAlchemy, Pydantic, JWT, pwdlib, Argon2 |
+| **Database** | PostgreSQL |
+| **AI Providers** | Google Gemini, Groq, OpenAI |
+| **Deployment** | Render, Render PostgreSQL, Docker |
 
 ---
 
