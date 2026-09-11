@@ -28,7 +28,7 @@ def prepare_assistant_context(
         db=db,
         conversation_id=conversation_id,
         user_id=user_id,
-        limit=12,
+        limit=20,
     )
 
     # 3. Let OpenAI decide which tools it needs

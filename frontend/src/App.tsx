@@ -5,15 +5,16 @@ import Sidebar from './components/Sidebar'
 import AdminUsage from './components/AdminUsage'
 import {
   createConversation,
+  deleteConversation,
   getConversations,
-  getMe,
   getMessages,
+  getMe,
+  renameConversation,
   sendMessage,
-} from './lib/api'
-import type {
-  Conversation,
-  Message,
-  User,
+  toggleConversationPin,
+  type Conversation,
+  type Message,
+  type User,
 } from './lib/api'
 
 function App() {
@@ -30,6 +31,11 @@ function App() {
   const [sending, setSending] = useState(false)
   const [mobileSidebarOpen, setMobileSidebarOpen] =
     useState(false)
+
+  const [deleteTarget, setDeleteTarget] =
+    useState<Conversation | null>(null)
+
+  const [deleting, setDeleting] = useState(false)
 
   async function loadApp() {
     try {
@@ -185,9 +191,113 @@ function App() {
     )
   }
 
+  async function handleTogglePin(conversationId: string) {
+    try {
+      const updatedConversation =
+        await toggleConversationPin(conversationId)
+
+      setConversations((current) =>
+        current
+          .map((conversation) =>
+            conversation.id === updatedConversation.id
+              ? updatedConversation
+              : conversation,
+          )
+          .sort((a, b) => {
+            if (a.pinned !== b.pinned) {
+              return a.pinned ? -1 : 1
+            }
+
+            return (
+              new Date(b.updated_at).getTime() -
+              new Date(a.updated_at).getTime()
+            )
+          }),
+      )
+    } catch (error) {
+      console.error('Failed to toggle conversation pin:', error)
+    }
+  }
+
+
+  async function handleRename(
+    conversationId: string,
+    title: string,
+  ) {
+    try {
+      const updatedConversation =
+        await renameConversation(
+          conversationId,
+          title,
+        )
+
+      setConversations((current) =>
+        current.map((conversation) =>
+          conversation.id === updatedConversation.id
+            ? updatedConversation
+            : conversation,
+        ),
+      )
+    } catch (error) {
+      console.error('Failed to rename conversation:', error)
+    }
+  }
+
+
+  function handleDelete(conversationId: string) {
+    const conversation = conversations.find(
+      (item) => item.id === conversationId,
+    )
+
+    if (!conversation) {
+      return
+    }
+
+    setDeleteTarget(conversation)
+  }
+
+
+  async function handleConfirmDelete() {
+    if (!deleteTarget || deleting) {
+      return
+    }
+
+    setDeleting(true)
+
+    try {
+      await deleteConversation(deleteTarget.id)
+
+      const remaining = conversations.filter(
+        (item) => item.id !== deleteTarget.id,
+      )
+
+      setConversations(remaining)
+      setDeleteTarget(null)
+
+      if (activeConversationId === deleteTarget.id) {
+        setMessages([])
+
+        if (remaining.length > 0) {
+          await handleSelectConversation(
+            remaining[0].id,
+          )
+        } else {
+          setActiveConversationId(null)
+        }
+      }
+    } catch (error) {
+      console.error(
+        'Failed to delete conversation:',
+        error,
+      )
+    } finally {
+      setDeleting(false)
+    }
+  }
+
 
   return (
-    <div className="flex h-[100dvh] overflow-hidden bg-[#0b0b0b] text-white">
+    <div className="relative flex h-[100dvh] overflow-hidden bg-[#0b0b0b] text-white">
       <Sidebar
         user={user}
         conversations={conversations}
@@ -201,6 +311,9 @@ function App() {
         onLogout={handleLogout}
         isAdmin={user.is_admin}
         onOpenUsage={() => setAdminUsageOpen(true)}
+        onTogglePin={handleTogglePin}
+        onRename={handleRename}
+        onDelete={handleDelete}
       />
 
       <ChatArea
@@ -210,6 +323,56 @@ function App() {
         onSend={handleSend}
         onOpenSidebar={() => setMobileSidebarOpen(true)}
       />
+
+      {deleteTarget && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 px-4 backdrop-blur-sm">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-dialog-title"
+            className="w-full max-w-md rounded-2xl border border-zinc-800 bg-[#111113] p-5 shadow-2xl"
+          >
+            <div className="mb-5">
+              <h2
+                id="delete-dialog-title"
+                className="text-base font-semibold text-zinc-100"
+              >
+                Delete Chat?
+              </h2>
+
+              <p className="mt-2 text-sm leading-6 text-zinc-500">
+                Are you sure you want to permanently delete
+                {' '}
+                <span className="font-medium text-zinc-300">
+                  "{deleteTarget.title || 'Untitled chat'}"
+                </span>
+                ? This will also delete all messages in this
+                Chat.
+              </p>
+            </div>
+
+            <div className="flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setDeleteTarget(null)}
+                disabled={deleting}
+                className="rounded-lg px-4 py-2 text-sm font-medium text-zinc-400 transition hover:bg-zinc-800 hover:text-zinc-200 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                onClick={handleConfirmDelete}
+                disabled={deleting}
+                className="rounded-lg bg-zinc-200 px-4 py-2 text-sm font-medium text-zinc-900 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {deleting ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

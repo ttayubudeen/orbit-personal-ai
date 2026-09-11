@@ -24,6 +24,10 @@ from app.services.conversations import (
     get_conversations_for_user,
     get_conversation_messages,
     get_conversation_for_user,
+    ensure_conversation_schema,
+    toggle_conversation_pin,
+    rename_conversation,
+    delete_conversation,
 )
 
 from app.services.assistant import prepare_assistant_context
@@ -61,6 +65,7 @@ def startup():
 
     try:
         ensure_llm_usage_table(db)
+        ensure_conversation_schema(db)
     finally:
         db.close()
 
@@ -97,6 +102,9 @@ def root():
 class CreateConversationRequest(BaseModel):
     title: str | None = None
 
+
+class RenameConversationRequest(BaseModel):
+    title: str
 
 @app.get("/admin/usage")
 def admin_usage(
@@ -159,6 +167,93 @@ def list_conversations(
 
     return {
         "conversations": conversations,
+    }
+
+
+@app.patch("/conversations/{conversation_id}/pin")
+def toggle_pin(
+    conversation_id: str,
+    current_user=Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    user_id = str(current_user["id"])
+
+    conversation = toggle_conversation_pin(
+        db=db,
+        conversation_id=conversation_id,
+        user_id=user_id,
+    )
+
+    if conversation is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Conversation not found.",
+        )
+
+    return conversation
+
+
+@app.patch("/conversations/{conversation_id}/title")
+def rename_chat(
+    conversation_id: str,
+    request: RenameConversationRequest,
+    current_user=Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    user_id = str(current_user["id"])
+
+    title = request.title.strip()
+
+    if not title:
+        raise HTTPException(
+            status_code=400,
+            detail="Conversation title cannot be empty.",
+        )
+
+    if len(title) > 100:
+        raise HTTPException(
+            status_code=400,
+            detail="Conversation title cannot exceed 100 characters.",
+        )
+
+    conversation = rename_conversation(
+        db=db,
+        conversation_id=conversation_id,
+        user_id=user_id,
+        title=title,
+    )
+
+    if conversation is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Conversation not found.",
+        )
+
+    return conversation
+
+
+@app.delete("/conversations/{conversation_id}")
+def delete_chat(
+    conversation_id: str,
+    current_user=Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    user_id = str(current_user["id"])
+
+    deleted = delete_conversation(
+        db=db,
+        conversation_id=conversation_id,
+        user_id=user_id,
+    )
+
+    if not deleted:
+        raise HTTPException(
+            status_code=404,
+            detail="Conversation not found.",
+        )
+
+    return {
+        "message": "Conversation deleted successfully.",
     }
 
 

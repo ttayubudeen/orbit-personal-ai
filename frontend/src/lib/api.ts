@@ -49,6 +49,7 @@ export interface User {
 export interface Conversation {
   id: string
   title: string | null
+  pinned: boolean
   created_at: string
   updated_at: string
 }
@@ -137,6 +138,41 @@ export async function sendMessage(
   })
 }
 
+export async function toggleConversationPin(
+  conversationId: string,
+) {
+  return request<Conversation>(
+    `/conversations/${conversationId}/pin`,
+    {
+      method: 'PATCH',
+    },
+  )
+}
+
+export async function renameConversation(
+  conversationId: string,
+  title: string,
+) {
+  return request<Conversation>(
+    `/conversations/${conversationId}/title`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify({
+        title,
+      }),
+    },
+  )
+}
+
+export async function deleteConversation(
+  conversationId: string,
+) {
+  return request<{
+    message: string
+  }>(`/conversations/${conversationId}`, {
+    method: 'DELETE',
+  })
+}
 
 export interface UsageSummary {
   ai_requests: number

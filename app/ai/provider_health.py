@@ -12,7 +12,7 @@ class ModelHealth:
 # COOLDOWN CONFIGURATION
 # ============================================================
 
-BASE_COOLDOWN_SECONDS = 120
+BASE_COOLDOWN_SECONDS = 60 * 30
 
 MAX_COOLDOWN_SECONDS = 60 * 60 * 6  # 6 hours
 
@@ -56,11 +56,11 @@ def mark_model_unavailable(
     """
     Progressive cooldown:
 
-        failure 1 -> 1 minute
-        failure 2 -> 2 minutes
-        failure 3 -> 4 minutes
-        failure 4 -> 8 minutes
-        failure 5 -> 16 minutes
+        failure 1 -> 30 minutes
+        failure 2 -> 1 hour
+        failure 3 -> 2 hours
+        failure 4 -> 4 hours
+        failure 5 -> 6 hours
         ...
         maximum -> 6 hours
     """
