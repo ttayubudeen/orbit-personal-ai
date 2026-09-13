@@ -16,6 +16,7 @@ interface ChatAreaProps {
   messages: Message[]
   loading: boolean
   sending: boolean
+  error?: string | null
   onSend: (message: string) => void
   onOpenSidebar: () => void
 }
@@ -43,6 +44,7 @@ function ChatArea({
   messages,
   loading,
   sending,
+  error,
   onSend,
   onOpenSidebar,
 }: ChatAreaProps) {
@@ -336,6 +338,7 @@ function ChatArea({
       <div className="shrink-0">
         <Composer
           disabled={sending || loading}
+          error={error}
           onSend={onSend}
         />
       </div>

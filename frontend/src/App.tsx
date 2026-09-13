@@ -29,6 +29,7 @@ function App() {
   const [messages, setMessages] = useState<Message[]>([])
   const [loading, setLoading] = useState(true)
   const [sending, setSending] = useState(false)
+  const [sendError, setSendError] = useState<string | null>(null)
   const [mobileSidebarOpen, setMobileSidebarOpen] =
     useState(false)
 
@@ -98,39 +99,41 @@ function App() {
   }
 
   async function handleSend(message: string) {
-    if (sending || !message.trim()) {
+    if (sending) {
       return
     }
 
+    setSendError(null)
     setSending(true)
 
-    const temporaryMessage: Message = {
-      id: `temp-${Date.now()}`,
-      role: 'user',
-      content: message,
-      created_at: new Date().toISOString(),
-    }
-
-    setMessages((current) => [
-      ...current,
-      temporaryMessage,
-    ])
+    let conversationId = activeConversationId
 
     try {
-      let conversationId = activeConversationId
-
+      // If we're on the home screen, create a new conversation first.
       if (!conversationId) {
-        const conversation = await createConversation()
+        const newConversation = await createConversation()
 
-        conversationId = conversation.id
+        conversationId = newConversation.id
 
-        setActiveConversationId(conversation.id)
+        setActiveConversationId(conversationId)
 
         setConversations((current) => [
-          conversation,
+          newConversation,
           ...current,
         ])
       }
+
+      const temporaryMessage: Message = {
+        id: `temp-${Date.now()}`,
+        role: 'user',
+        content: message,
+        created_at: new Date().toISOString(),
+      }
+
+      setMessages((current) => [
+        ...current,
+        temporaryMessage,
+      ])
 
       await sendMessage(conversationId, message)
 
@@ -147,11 +150,32 @@ function App() {
     } catch (error) {
       console.error(error)
 
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'Something went wrong while sending your message.'
+
       setMessages((current) =>
         current.filter(
-          (item) => item.id !== temporaryMessage.id,
+          (item) =>
+            !(
+              item.id.startsWith('temp-') &&
+              item.content === message
+            ),
         ),
       )
+
+      if (
+        errorMessage.toLowerCase().includes('10000') ||
+        errorMessage.toLowerCase().includes('too long') ||
+        errorMessage.toLowerCase().includes('max_length')
+      ) {
+        setSendError(
+          'Message is too long. Please keep your message under 10,000 characters.',
+        )
+      } else {
+        setSendError(errorMessage)
+      }
     } finally {
       setSending(false)
     }
@@ -320,6 +344,7 @@ function App() {
         messages={messages}
         loading={loading}
         sending={sending}
+        error={sendError}
         onSend={handleSend}
         onOpenSidebar={() => setMobileSidebarOpen(true)}
       />

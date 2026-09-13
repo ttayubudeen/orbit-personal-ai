@@ -489,6 +489,43 @@ def get_openai_tools():
     return converted_tools
 
 
+
+def get_groq_tools():
+    """
+    Convert the internal tool definitions into the
+    OpenAI Chat Completions format used by Groq.
+    """
+
+    groq_tools = []
+
+    for tool in TASK_TOOLS:
+        if tool.get("type") != "function":
+            continue
+
+        if "name" in tool:
+            groq_tools.append(
+                {
+                    "type": "function",
+                    "function": {
+                        "name": tool["name"],
+                        "description": tool.get(
+                            "description",
+                            "",
+                        ),
+                        "parameters": tool.get(
+                            "parameters",
+                            {},
+                        ),
+                    },
+                }
+            )
+
+        elif "function" in tool:
+            groq_tools.append(tool)
+
+    return groq_tools
+
+
 # ============================================================
 # GEMINI TOOL FORMAT
 # ============================================================
@@ -878,7 +915,7 @@ def generate_with_groq(
         response = groq_client.chat.completions.create(
             model=model,
             messages=messages,
-            tools=get_openai_tools(),
+            tools=get_groq_tools(),
             tool_choice="auto",
         )
 

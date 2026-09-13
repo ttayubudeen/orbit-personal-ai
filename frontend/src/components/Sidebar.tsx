@@ -527,12 +527,55 @@ function Sidebar({
             </button>
           )}
 
+          {!collapsed && (
+            <div className="mb-3 px-1">
+              <div className="rounded-xl border border-zinc-800/80 bg-zinc-900/40 px-3 py-3">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-zinc-500">
+                      Built by
+                    </p>
+
+                    <p className="mt-1 text-[15px] font-semibold tracking-tight text-zinc-100">
+                      Tayub
+                    </p>
+
+                    <p className="mt-0.5 text-[11px] text-zinc-600">
+                      Personal AI · ORBIT
+                    </p>
+                  </div>
+
+                  <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-zinc-800 bg-zinc-950 text-[11px] font-semibold text-zinc-400">
+                    T
+                  </span>
+                </div>
+
+                <a
+                  href="https://github.com/ttayubudeen"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-3 flex items-center justify-between rounded-lg border border-zinc-800 bg-zinc-950/70 px-2.5 py-2 text-[11px] text-zinc-400 transition hover:border-zinc-700 hover:bg-zinc-900 hover:text-zinc-200"
+                  aria-label="Tayyub's GitHub profile"
+                  title="GitHub"
+                >
+                  <span className="font-medium">
+                    GitHub
+                  </span>
+
+                  <span className="text-zinc-600 transition group-hover:text-zinc-400">
+                    ↗
+                  </span>
+                </a>
+              </div>
+            </div>
+          )}
+
           <div
             className={[
               'flex items-center rounded-xl',
               collapsed
                 ? 'justify-center'
-                : 'gap-3 px-2 py-2',
+                : 'gap-3 border-t border-zinc-800/70 px-2 pt-3',
             ].join(' ')}
           >
             <div
@@ -566,6 +609,7 @@ function Sidebar({
               </>
             )}
           </div>
+
         </div>
       </aside>
     </>
